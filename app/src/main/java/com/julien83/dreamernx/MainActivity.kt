@@ -57,12 +57,22 @@ class MainActivity : AppCompatActivity() {
         override fun doInBackground(vararg params: Void): List<String>
         {
             try {
+                //declaration des variable local
+                var response1 =""
+                var response2 =""
+                var response3 =""
+                var response11 =""
+                var response12 =""
+                var response13 =""
+                var response21 =""
+                var response22 =""
+                var response23 =""
 
                 //recupération de l'IP et du Port de IHM
                 val serverAddress = InetAddress.getByName(ipEditText.text.toString())
                 val serverPort = portEditText.text.toString().toInt()
                 val sockaddr: SocketAddress = InetSocketAddress(serverAddress, serverPort)
-                //Overture du socket
+                //Ouverture du socket
                 val socket = Socket()
                 socket.connect(sockaddr,10000)
                 //val soc = Socket(serverAddress, serverPort)
@@ -77,36 +87,84 @@ class MainActivity : AppCompatActivity() {
                         dataout.writeBytes("~M601 S1\r\n")
                         dataout.flush()
                         var cpt = 0
-                        while (!inputStream.ready()|| cpt< 3)
+						
+                        while (cpt < 3)
                         {
-                            Thread.sleep(10)
-                            cpt++
+							if(inputStream.ready())
+							{
+								response1 = inputStream.readLine()
+								response2 = inputStream.readLine()
+								response3 = inputStream.readLine()
+								cpt = 3
+							}
+							else
+							{
+								Thread.sleep(100)
+								cpt++
+							}   
                         }
-                        val response1 = inputStream.readLine()
-                        val response2 = inputStream.readLine()
-                        val response3 = inputStream.readLine()
-
+						
+						
+						
                         //Avancement 3DPrint
                         dataout.writeBytes("~M27\r\n")
                         dataout.flush()
-                        val response11 = inputStream.readLine()
-                        val response12 = inputStream.readLine()
-                        val response13 = inputStream.readLine()
-
+						cpt = 0
+                        while (cpt < 3)
+                        {
+							if(inputStream.ready())
+							{
+								response11 = inputStream.readLine()
+								response12 = inputStream.readLine()
+								response13 = inputStream.readLine()
+								cpt = 3
+							}
+							else
+							{
+								Thread.sleep(100)
+								cpt++
+							}   
+                        }
+						
                         //Temperature machine
                         dataout.writeBytes("~M105\r\n")
                         dataout.flush()
-                        val response21 = inputStream.readLine()
-                        val response22 = inputStream.readLine()
-                        val response23 = inputStream.readLine()
-
+						cpt = 0
+                        while (cpt < 3)
+                        {
+							if(inputStream.ready())
+							{
+								response21 = inputStream.readLine()
+								response22 = inputStream.readLine()
+								response23 = inputStream.readLine()
+								cpt = 3
+							}
+							else
+							{
+								Thread.sleep(100)
+								cpt++
+							}   
+                        }
+						
                         // Demande Statut
                         /*dataout.writeBytes("~M119\r\n")
                         dataout.flush()
-                        val response31 = inputStream.readLine()
-                        val response32 = inputStream.readLine()
-                        val response33 = inputStream.readLine()
-                        val response34 = inputStream.readLine()*/
+						cpt = 0
+                        while (cpt < 3)
+                        {
+							if(inputStream.ready())
+							{
+								val response31 = inputStream.readLine()
+								val response32 = inputStream.readLine()
+								val response33 = inputStream.readLine()
+								cpt = 3
+							}
+							else
+							{
+								Thread.sleep(100)
+								cpt++
+							}   
+                        }*/
 
 
                         var printingList = response12.split(" ", "/")
@@ -145,7 +203,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onPostExecute(listRet: List<String>) {
 
-            StatusView.text = "OFF"
+            StatusView.text = "Disconnected"
             if(listRet.get(0).equals("Error"))
             {
                 val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
