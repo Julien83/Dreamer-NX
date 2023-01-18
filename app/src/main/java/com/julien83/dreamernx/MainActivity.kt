@@ -16,8 +16,11 @@ import java.net.SocketAddress
 
 class MainActivity : AppCompatActivity() {
     private lateinit var StatusView: TextView
+    private lateinit var StatusNXView: TextView
+    private lateinit var StatusMoveView: TextView
     private lateinit var BuseTempView: TextView
     private lateinit var BedTempView: TextView
+
     private lateinit var PrintProgessBar: ProgressBar
     private lateinit var ButtonConnect: Button
     private lateinit var ButtonStop: Button
@@ -30,6 +33,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         BuseTempView = findViewById(R.id.textBuse)
         BedTempView = findViewById(R.id.textBed)
+        StatusNXView = findViewById(R.id.textStatusNX)
+        StatusMoveView = findViewById(R.id.textStatusMove)
         PrintProgessBar = findViewById(R.id.progressBar)
         ButtonConnect = findViewById(R.id.buttonCONNECT)
         ButtonStop = findViewById(R.id.buttonSTOP)
@@ -67,6 +72,11 @@ class MainActivity : AppCompatActivity() {
                 var response21 =""
                 var response22 =""
                 var response23 =""
+                var response31 =""
+                var response32 =""
+                var response33 =""
+                var response34 =""
+                var response35 =""
 
                 //recupération de l'IP et du Port de IHM
                 val serverAddress = InetAddress.getByName(ipEditText.text.toString())
@@ -95,7 +105,7 @@ class MainActivity : AppCompatActivity() {
                                 response3 = inputStream.readLine()
                                 cpt = 3
                             } else {
-                                Thread.sleep(100)
+                                Thread.sleep(1000)
                                 cpt++
                             }
                         }
@@ -105,14 +115,14 @@ class MainActivity : AppCompatActivity() {
                         dataout.writeBytes("~M27\r\n")
                         dataout.flush()
                         cpt = 0
-                        while (cpt < 3) {
+                        while (cpt < 10) {
                             if (inputStream.ready()) {
                                 response11 = inputStream.readLine()
                                 response12 = inputStream.readLine()
                                 response13 = inputStream.readLine()
-                                cpt = 3
+                                cpt = 10
                             } else {
-                                Thread.sleep(100)
+                                Thread.sleep(1000)
                                 cpt++
                             }
                         }
@@ -128,41 +138,49 @@ class MainActivity : AppCompatActivity() {
                                 response23 = inputStream.readLine()
                                 cpt = 3
                             } else {
-                                Thread.sleep(100)
+                                Thread.sleep(1000)
                                 cpt++
                             }
                         }
 
                         // Demande Statut
-                        /*dataout.writeBytes("~M119\r\n")
+                        dataout.writeBytes("~M119\r\n")
                         dataout.flush()
 						cpt = 0
                         while (cpt < 3)
                         {
 							if(inputStream.ready())
 							{
-								val response31 = inputStream.readLine()
-								val response32 = inputStream.readLine()
-								val response33 = inputStream.readLine()
+								response31 = inputStream.readLine()
+								response32 = inputStream.readLine()
+								response33 = inputStream.readLine()
+                                response34 = inputStream.readLine()
+                                response35 = inputStream.readLine()
 								cpt = 3
 							}
 							else
 							{
-								Thread.sleep(100)
+								Thread.sleep(1000)
 								cpt++
 							}   
-                        }*/
+                        }
 
 
                         var printingList = response12.split(" ", "/")
-                        var tempList = response22.split(":", "/")
+                        var tempList = response22.split(":", "/"," ")
+                        var machineStatus= response33.split(" ")
+                        var moveStatus= response34.split(" ")
 
 
                         var listRet = listOf<String>(
                             tempList[1],
                             tempList[3],
+                            tempList[5],
+                            tempList[7],
                             printingList[3],
-                            printingList[4]
+                            printingList[4],
+                            machineStatus[1],
+                            moveStatus[1]
                         )
 
                         publishProgress(listRet)
@@ -198,11 +216,15 @@ class MainActivity : AppCompatActivity() {
 
         override fun onProgressUpdate(vararg values: List<String>) {
             super.onProgressUpdate(*values)
-            StatusView.text = R.string.connected.toString()
-            BuseTempView.text = values.get(0).get(0)+"°C"
-            BedTempView.text = values.get(0).get(1)+"°C"
-            val printingBytes = values[0][2].toInt()
-            val totalBytes = values[0][3].toInt()
+            StatusView.text = "Connected"
+            BuseTempView.text = values[0][0]+"°C - "+values[0][1]+"°C"
+            BedTempView.text = values[0][2]+"°C - "+values[0][3]+"°C"
+            StatusNXView.text = values[0][6]
+            StatusMoveView.text = values[0][7]
+
+            //calcul du pourcentage d'avancement
+            val printingBytes = values[0][4].toInt()
+            val totalBytes = values[0][5].toInt()
             if(totalBytes!=0)
             {
                 val progress = (printingBytes * 100) / totalBytes

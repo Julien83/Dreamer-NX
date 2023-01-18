@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Dreamer NX</string>
     <string name="connected">Connected</string>
+    <string name="printing_progression">Printing Progression</string>
+    <string name="temperature">Temperature</string>
+    <string name="buse">Buse</string>
+    <string name="bed">Bed</string>
+    <string name="_0_c">0°C</string>
+    <string name="stop">Stop</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="status">Status</string>
+    <string name="move">Move</string>
+    <string name="nulll">...</string>
 </resources>
