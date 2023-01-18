@@ -82,70 +82,57 @@ class MainActivity : AppCompatActivity() {
                     val inputStream = BufferedReader(InputStreamReader(socket.getInputStream()))
 
                     //boucle d'envoie des trame de demande d'information
-                    while(runthead){
+                    while (runthead) {
                         //Connexion a la machine
                         dataout.writeBytes("~M601 S1\r\n")
                         dataout.flush()
                         var cpt = 0
-						
-                        while (cpt < 3)
-                        {
-							if(inputStream.ready())
-							{
-								response1 = inputStream.readLine()
-								response2 = inputStream.readLine()
-								response3 = inputStream.readLine()
-								cpt = 3
-							}
-							else
-							{
-								Thread.sleep(100)
-								cpt++
-							}   
+
+                        while (cpt < 3) {
+                            if (inputStream.ready()) {
+                                response1 = inputStream.readLine()
+                                response2 = inputStream.readLine()
+                                response3 = inputStream.readLine()
+                                cpt = 3
+                            } else {
+                                Thread.sleep(100)
+                                cpt++
+                            }
                         }
-						
-						
-						
+
+
                         //Avancement 3DPrint
                         dataout.writeBytes("~M27\r\n")
                         dataout.flush()
-						cpt = 0
-                        while (cpt < 3)
-                        {
-							if(inputStream.ready())
-							{
-								response11 = inputStream.readLine()
-								response12 = inputStream.readLine()
-								response13 = inputStream.readLine()
-								cpt = 3
-							}
-							else
-							{
-								Thread.sleep(100)
-								cpt++
-							}   
+                        cpt = 0
+                        while (cpt < 3) {
+                            if (inputStream.ready()) {
+                                response11 = inputStream.readLine()
+                                response12 = inputStream.readLine()
+                                response13 = inputStream.readLine()
+                                cpt = 3
+                            } else {
+                                Thread.sleep(100)
+                                cpt++
+                            }
                         }
-						
+
                         //Temperature machine
                         dataout.writeBytes("~M105\r\n")
                         dataout.flush()
-						cpt = 0
-                        while (cpt < 3)
-                        {
-							if(inputStream.ready())
-							{
-								response21 = inputStream.readLine()
-								response22 = inputStream.readLine()
-								response23 = inputStream.readLine()
-								cpt = 3
-							}
-							else
-							{
-								Thread.sleep(100)
-								cpt++
-							}   
+                        cpt = 0
+                        while (cpt < 3) {
+                            if (inputStream.ready()) {
+                                response21 = inputStream.readLine()
+                                response22 = inputStream.readLine()
+                                response23 = inputStream.readLine()
+                                cpt = 3
+                            } else {
+                                Thread.sleep(100)
+                                cpt++
+                            }
                         }
-						
+
                         // Demande Statut
                         /*dataout.writeBytes("~M119\r\n")
                         dataout.flush()
@@ -172,10 +159,10 @@ class MainActivity : AppCompatActivity() {
 
 
                         var listRet = listOf<String>(
-                            tempList.get(1),
-                            tempList.get(3),
-                            printingList.get(3),
-                            printingList.get(4)
+                            tempList[1],
+                            tempList[3],
+                            printingList[3],
+                            printingList[4]
                         )
 
                         publishProgress(listRet)
@@ -183,34 +170,29 @@ class MainActivity : AppCompatActivity() {
                     }
                     dataout.close()
                     socket.close()
-                    var listOk = listOf<String>("Ok","Finish")
-                    return listOk
-                }
-                catch (e: Exception) {
+                    return listOf("Ok", "Finish")
+                } catch (e: Exception) {
                     e.printStackTrace()
-                    var listErr = listOf<String>("Error", "Error: ${e.message}")
-                    return listErr
+                    return listOf("Error", "Error: ${e.message}")
 
                 }
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
                 //var listErr = listOf<String>("Error", "Error: ${e.message}")
-                var listErr = listOf<String>("Error", "3DPrinter No Found")
-                return listErr
+                return listOf("Error", "3DPrinter No Found")
             }
         }
 
         override fun onPostExecute(listRet: List<String>) {
 
             StatusView.text = "Disconnected"
-            if(listRet.get(0).equals("Error"))
+            if(listRet[0] == "Error")
             {
                 val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE, 150)
             }
 
-            Toast.makeText(this@MainActivity,listRet.get(1),Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, listRet[1],Toast.LENGTH_SHORT).show()
 
         }
 
@@ -223,14 +205,13 @@ class MainActivity : AppCompatActivity() {
             val totalBytes = values.get(0).get(3).toInt()
             if(totalBytes!=0)
             {
-                val pourcent = (printingBytes * 100) / totalBytes
-                PrintProgessBar.setProgress(pourcent)
-                if(pourcent == 100)
+                val progress = (printingBytes * 100) / totalBytes
+                PrintProgessBar.progress = progress
+                if(progress == 100)
                 {
                     val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
                     toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
                 }
-
             }
         }
     }
