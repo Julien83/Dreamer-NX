@@ -198,11 +198,11 @@ class MainActivity : AppCompatActivity() {
 
         override fun onProgressUpdate(vararg values: List<String>) {
             super.onProgressUpdate(*values)
-            StatusView.text = "Connected"
+            StatusView.text = R.string.connected.toString()
             BuseTempView.text = values.get(0).get(0)+"°C"
             BedTempView.text = values.get(0).get(1)+"°C"
-            val printingBytes = values.get(0).get(2).toInt()
-            val totalBytes = values.get(0).get(3).toInt()
+            val printingBytes = values[0][2].toInt()
+            val totalBytes = values[0][3].toInt()
             if(totalBytes!=0)
             {
                 val progress = (printingBytes * 100) / totalBytes
