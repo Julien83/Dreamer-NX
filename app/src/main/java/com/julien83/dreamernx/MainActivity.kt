@@ -1,16 +1,18 @@
 package com.julien83.dreamernx
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.AsyncTask
+import android.os.Bundle
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
 import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketAddress
 
 class MainActivity : AppCompatActivity() {
     private lateinit var StatusView: TextView
@@ -59,12 +61,15 @@ class MainActivity : AppCompatActivity() {
                 //recupération de l'IP et du Port de IHM
                 val serverAddress = InetAddress.getByName(ipEditText.text.toString())
                 val serverPort = portEditText.text.toString().toInt()
+                val sockaddr: SocketAddress = InetSocketAddress(serverAddress, serverPort)
                 //Overture du socket
-                val soc = Socket(serverAddress, serverPort)
+                val socket = Socket()
+                socket.connect(sockaddr,10000)
+                //val soc = Socket(serverAddress, serverPort)
                 try {
                     //Ouverture des flux d'entrée et de sortie du socket
-                    val dataout = DataOutputStream(soc.getOutputStream())
-                    val inputStream = BufferedReader(InputStreamReader(soc.getInputStream()))
+                    val dataout = DataOutputStream(socket.getOutputStream())
+                    val inputStream = BufferedReader(InputStreamReader(socket.getInputStream()))
 
                     //boucle d'envoie des trame de demande d'information
                     while(runthead){
@@ -119,7 +124,7 @@ class MainActivity : AppCompatActivity() {
                         Thread.sleep(1000)
                     }
                     dataout.close()
-                    soc.close()
+                    socket.close()
                     var listOk = listOf<String>("Ok","Finish")
                     return listOk
                 }
