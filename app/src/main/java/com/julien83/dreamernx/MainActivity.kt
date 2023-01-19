@@ -97,6 +97,7 @@ class MainActivity : AppCompatActivity() {
                         dataout.writeBytes("~M601 S1\r\n")
                         dataout.flush()
                         var cpt = 0
+                        var notfail = 0
 
                         while (cpt < 3) {
                             if (inputStream.ready()) {
@@ -104,6 +105,7 @@ class MainActivity : AppCompatActivity() {
                                 response2 = inputStream.readLine()
                                 response3 = inputStream.readLine()
                                 cpt = 3
+                                notfail ++
                             } else {
                                 Thread.sleep(1000)
                                 cpt++
@@ -121,6 +123,7 @@ class MainActivity : AppCompatActivity() {
                                 response12 = inputStream.readLine()
                                 response13 = inputStream.readLine()
                                 cpt = 10
+                                notfail ++
                             } else {
                                 Thread.sleep(1000)
                                 cpt++
@@ -137,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                                 response22 = inputStream.readLine()
                                 response23 = inputStream.readLine()
                                 cpt = 3
+                                notfail ++
                             } else {
                                 Thread.sleep(1000)
                                 cpt++
@@ -146,7 +150,7 @@ class MainActivity : AppCompatActivity() {
                         // Demande Statut
                         dataout.writeBytes("~M119\r\n")
                         dataout.flush()
-						cpt = 0
+                        cpt = 0
                         while (cpt < 3)
                         {
 							if(inputStream.ready())
@@ -157,6 +161,7 @@ class MainActivity : AppCompatActivity() {
                                 response34 = inputStream.readLine()
                                 response35 = inputStream.readLine()
 								cpt = 3
+                                notfail ++
 							}
 							else
 							{
@@ -165,25 +170,27 @@ class MainActivity : AppCompatActivity() {
 							}   
                         }
 
+                        if( notfail == 4){
+                            val printingList = response12.split(" ", "/")
+                            val tempList = response22.split(":", "/"," ")
+                            val machineStatus= response33.split(" ")
+                            val moveStatus= response34.split(" ")
 
-                        var printingList = response12.split(" ", "/")
-                        var tempList = response22.split(":", "/"," ")
-                        var machineStatus= response33.split(" ")
-                        var moveStatus= response34.split(" ")
 
+                            val listRet = listOf<String>(
+                                tempList[1],
+                                tempList[3],
+                                tempList[5],
+                                tempList[7],
+                                printingList[3],
+                                printingList[4],
+                                machineStatus[1],
+                                moveStatus[1]
+                            )
 
-                        var listRet = listOf<String>(
-                            tempList[1],
-                            tempList[3],
-                            tempList[5],
-                            tempList[7],
-                            printingList[3],
-                            printingList[4],
-                            machineStatus[1],
-                            moveStatus[1]
-                        )
+                            publishProgress(listRet)
+                        }
 
-                        publishProgress(listRet)
                         Thread.sleep(1000)
                     }
                     dataout.close()
